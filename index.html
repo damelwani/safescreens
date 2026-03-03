@@ -52,6 +52,45 @@
     }
     nav a:hover { color: var(--teal); }
     .nav-links { display: flex; gap: 2rem; align-items: center; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--navy);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    
+    @media (max-width: 640px) {
+      .hamburger { display: flex; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: rgba(253,248,240,0.97);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(13,43,69,0.08);
+        padding: 1rem 5vw;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 0.85rem 0; border-bottom: 1px solid rgba(13,43,69,0.06); width: 100%; }
+      .nav-links a:last-child { border-bottom: none; }
+      .btn-nav { border-radius: 0; background: none !important; color: var(--navy) !important; padding: 0.85rem 0; }
+    }
     .btn-nav {
       background: var(--navy); color: var(--cream) !important;
       padding: 0.55rem 1.3rem; border-radius: 100px;
@@ -295,11 +334,14 @@
   <!-- NAV -->
   <nav>
     <div class="nav-logo">Safe<span>Screens</span> <span style="font-weight:300;font-size:0.85rem;color:#777">by TrackHW</span></div>
+    <button class="hamburger" onclick="this.classList.toggle('open'); document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
     <div class="nav-links">
-      <a href="#how">How It Works</a>
-      <a href="#services">Services</a>
-      <a href="#why">Why Me</a>
-      <a href="#contact" class="btn-nav">Contact Me</a>
+        <a href="#how">How It Works</a>
+        <a href="#services">Services</a>
+        <a href="#why">Why Me</a>
+        <a href="#contact" class="btn-nav">Contact Me</a>
     </div>
   </nav>
 
@@ -448,6 +490,11 @@
         <div class="why-icon">🔄</div>
         <h4>Ongoing Help</h4>
         <p>Tech changes fast. I'm available to update settings as your kids get older or new devices arrive.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💵</div>
+        <h4>Tiered Pricing</h4>
+        <p>Pricing calculated based on what you need and how many devices there are, with a discount for more than one. 10% of the cost goes to a local charity of your choice.</p>
       </div>
     </div>
   </section>
