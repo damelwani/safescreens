@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iOS Screen Time Seminar · Safer Screens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky: #d4f0ff;
+      --navy: #0d2b45;
+      --teal: #1a8fa0;
+      --mint: #a8e6d8;
+      --cream: #fdf8f0;
+      --coral: #f07a5a;
+      --warm: #fff4e6;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--navy);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5vw;
+      background: rgba(253,248,240,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(13,43,69,0.08);
+    }
+    .nav-logo {
+      font-family: 'Fraunces', serif;
+      font-weight: 900; font-size: 1.25rem;
+      color: var(--navy); letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--teal); }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    nav a {
+      text-decoration: none; color: var(--navy);
+      font-size: 0.9rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--teal); }
+    .btn-nav {
+      background: var(--navy); color: var(--cream) !important;
+      padding: 0.55rem 1.3rem; border-radius: 100px;
+      transition: background 0.2s !important;
+    }
+    .btn-nav:hover { background: var(--teal) !important; }
+
+    /* HAMBURGER */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; background: none; border: none; padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--navy); border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 640px) {
+      .hamburger { display: flex; }
+      .nav-links {
+        display: none; flex-direction: column; gap: 0;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: rgba(253,248,240,0.97);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(13,43,69,0.08);
+        padding: 1rem 5vw;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 0.85rem 0; border-bottom: 1px solid rgba(13,43,69,0.06); width: 100%; }
+      .nav-links a:last-child { border-bottom: none; }
+      .btn-nav { border-radius: 0; background: none !important; color: var(--navy) !important; padding: 0.85rem 0; }
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 5vw 5rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, var(--sky) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, var(--mint) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--mint); color: var(--navy);
+      padding: 0.4rem 1.1rem; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 500;
+      margin-bottom: 1.8rem; position: relative; z-index: 1;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-weight: 900; font-size: clamp(2.8rem, 7vw, 5.5rem);
+      line-height: 1.0; letter-spacing: -0.03em;
+      position: relative; z-index: 1;
+    }
+    h1 em { font-style: italic; color: var(--teal); }
+
+    .hero-sub {
+      max-width: 520px; margin: 1.5rem auto 0;
+      font-size: 1.1rem; line-height: 1.65; font-weight: 300; color: #3a5a70;
+      position: relative; z-index: 1;
+    }
+
+    /* INFO BAR */
+    .info-bar {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;
+      margin-top: 2.5rem; position: relative; z-index: 1;
+    }
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: #fff; border: 1px solid rgba(13,43,69,0.1);
+      border-radius: 100px; padding: 0.55rem 1.2rem;
+      font-size: 0.88rem; font-weight: 500; color: var(--navy);
+      box-shadow: 0 2px 10px rgba(13,43,69,0.06);
+    }
+    .info-chip.highlight {
+      background: var(--coral); color: #fff; border-color: var(--coral);
+    }
+
+    .hero-cta {
+      margin-top: 2.5rem; display: flex; gap: 1rem;
+      justify-content: center; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .btn-primary {
+      background: var(--coral); color: #fff;
+      padding: 0.9rem 2.2rem; border-radius: 100px;
+      font-size: 1rem; font-weight: 500; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(240,122,90,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(240,122,90,0.45); }
+    .btn-secondary {
+      background: transparent; color: var(--navy);
+      padding: 0.9rem 2.2rem; border-radius: 100px;
+      font-size: 1rem; font-weight: 500; text-decoration: none;
+      border: 1.5px solid var(--navy);
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { background: var(--navy); color: var(--cream); }
+
+    /* SECTIONS */
+    section { padding: 6rem 5vw; }
+
+    .section-label {
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 0.8rem;
+    }
+    h2 {
+      font-family: 'Fraunces', serif;
+      font-weight: 900; font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.2rem;
+    }
+    .section-desc {
+      font-size: 1.05rem; line-height: 1.7; color: #4a6070; max-width: 560px;
+    }
+
+    /* ABOUT */
+    #about { background: var(--cream); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center; margin-top: 3rem;
+    }
+    @media (max-width: 720px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-text p {
+      font-size: 1.05rem; line-height: 1.8; color: #3a5a70;
+      font-weight: 300; margin-bottom: 1.2rem;
+    }
+    .about-text p:last-child { margin-bottom: 0; }
+    .about-text strong { font-weight: 500; color: var(--navy); }
+    .about-text a { color: var(--teal); text-decoration: none; }
+    .about-text a:hover { text-decoration: underline; }
+    .prereq-card {
+      background: var(--navy); color: var(--sky);
+      border-radius: 20px; padding: 2.2rem;
+    }
+    .prereq-card h3 {
+      font-family: 'Fraunces', serif;
+      font-weight: 600; font-size: 1.3rem;
+      color: #fff; margin-bottom: 1.2rem;
+    }
+    .prereq-item {
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      margin-bottom: 1rem; font-size: 0.92rem;
+      color: var(--sky); line-height: 1.6;
+    }
+    .prereq-item:last-child { margin-bottom: 0; }
+    .prereq-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .prereq-note {
+      margin-top: 1.4rem;
+      background: rgba(168,230,216,0.12);
+      border: 1px solid rgba(168,230,216,0.2);
+      border-radius: 10px; padding: 1rem 1.2rem;
+      font-size: 0.82rem; color: var(--mint); line-height: 1.6;
+    }
+
+    /* TOPICS */
+    #topics { background: var(--warm); }
+    .topics-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .topic-card {
+      background: var(--cream); border-radius: 18px;
+      padding: 1.8rem 1.6rem;
+      border: 1px solid rgba(13,43,69,0.07);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .topic-card:hover { transform: translateY(-5px); box-shadow: 0 14px 36px rgba(13,43,69,0.09); }
+    .topic-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+    .topic-card h3 { font-size: 1rem; font-weight: 500; margin-bottom: 0.4rem; }
+    .topic-card p { font-size: 0.87rem; color: #5a7080; line-height: 1.6; }
+
+    /* EVENT DETAILS */
+    #details { background: var(--cream); }
+    .details-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.2rem; margin-top: 3rem;
+    }
+    @media (max-width: 600px) { .details-grid { grid-template-columns: 1fr; } }
+    .detail-item {
+      background: var(--warm);
+      border-radius: 14px; padding: 1.4rem 1.6rem;
+      border-left: 3px solid var(--teal);
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .detail-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+    .detail-item h4 { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.3rem; }
+    .detail-item p { font-size: 0.95rem; color: var(--navy); line-height: 1.5; }
+    .detail-item .note { font-size: 0.78rem; color: #5a7080; margin-top: 0.2rem; }
+
+    /* RSVP */
+    #rsvp {
+      background: var(--navy);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    #rsvp::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(26,143,160,0.25) 0%, transparent 70%);
+    }
+    #rsvp h2 { color: #fff; position: relative; }
+    #rsvp .section-label { color: var(--mint); }
+    .rsvp-desc {
+      color: var(--sky); font-size: 1.05rem; line-height: 1.7;
+      max-width: 480px; margin: 0 auto 2rem; position: relative;
+    }
+    .rsvp-capacity {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(240,122,90,0.2); border: 1px solid rgba(240,122,90,0.3);
+      color: #f0a080; padding: 0.4rem 1.1rem; border-radius: 100px;
+      font-size: 0.82rem; font-weight: 500;
+      margin-bottom: 2rem; position: relative;
+    }
+    .btn-rsvp {
+      display: inline-block;
+      background: var(--coral); color: #fff;
+      padding: 1rem 2.8rem; border-radius: 100px;
+      font-size: 1.1rem; font-weight: 500; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(240,122,90,0.4);
+      position: relative;
+    }
+    .btn-rsvp:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(240,122,90,0.5); }
+    .rsvp-note {
+      margin-top: 1.5rem; font-size: 0.8rem;
+      color: rgba(212,240,255,0.35); position: relative;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--navy); color: rgba(212,240,255,0.5);
+      text-align: center; padding: 1.5rem 5vw;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer strong { color: var(--sky); }
+    footer a { color: var(--sky); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/index.html" class="nav-logo">Safer <span>Screens</span></a>
+    <button class="hamburger" onclick="this.classList.toggle('open'); document.querySelector('.nav-links').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#topics">Topics</a>
+      <a href="#details">Details</a>
+      <a href="#rsvp" class="btn-nav">RSVP</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-badge"><div class="dot"></div> Port Washington Public Library</div>
+    <h1>iOS Screen Time<br/><em>Seminar</em></h1>
+    <p class="hero-sub">A comprehensive, hands-on walk-through of iOS Screen Time — designed for parents of kids entering 6th grade and younger.</p>
+    <div class="info-bar">
+      <div class="info-chip">📅 Date TBA</div>
+      <div class="info-chip">📍 Meeting Room TBA</div>
+      <div class="info-chip">⏱️ 1 Hour</div>
+      <div class="info-chip highlight">🎟️ $10 at the Door</div>
+    </div>
+    <div class="hero-cta">
+      <a href="#rsvp" class="btn-primary">Reserve Your Seat</a>
+      <a href="#topics" class="btn-secondary">See What's Covered</a>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-text">
+        <div class="section-label">About the Seminar</div>
+        <h2>Learn It Once,<br/>Use It Forever</h2>
+        <p>iOS Screen Time is one of the most powerful parental control tools available — but most parents never fully explore it. In this one-hour seminar, I'll walk you through every section, step by step, so you leave feeling confident and in control.</p>
+        <p>This seminar is designed for <strong>parents of children entering 6th grade and younger</strong>. Whether your child just got their first device or you've been struggling to stay on top of it, this session will give you the tools you need.</p>
+        <p>Can't make it but still want help? <a href="mailto:saferscreens@trackhw.com">Email me</a> to book a private 1-on-1 appointment.</p>
+      </div>
+      <div class="prereq-card">
+        <h3>What to Bring</h3>
+        <div class="prereq-item"><span class="prereq-icon">📱</span><span>Your own iPhone or iPad — that's all you need.</span></div>
+        <div class="prereq-item"><span class="prereq-icon">👨‍👩‍👧</span><span>Family Sharing should be set up before you arrive so we can hit the ground running.</span></div>
+        <div class="prereq-item"><span class="prereq-icon">🔋</span><span>Make sure your device is charged and you know your Apple ID password.</span></div>
+        <div class="prereq-note">
+          💡 <strong style="color:#fff;">Haven't set up Family Sharing yet?</strong> No problem — <a href="mailto:saferscreens@trackhw.com" style="color:#a8e6d8;">reach out to me</a> before the seminar and we can set it up together in a quick 1-on-1 appointment.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPICS -->
+  <section id="topics">
+    <div style="text-align:center; max-width:640px; margin: 0 auto 0;">
+      <div class="section-label">What We'll Cover</div>
+      <h2>A Full Walk-Through of iOS Screen Time</h2>
+      <p class="section-desc" style="margin: 0 auto;">Every major feature, explained clearly and set up live on your device.</p>
+    </div>
+    <div class="topics-grid">
+      <div class="topic-card">
+        <div class="topic-icon">⏱️</div>
+        <h3>App Limits</h3>
+        <p>Set daily time limits on specific apps or categories — social media, games, entertainment, and more.</p>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">🌙</div>
+        <h3>Downtime</h3>
+        <p>Schedule times when only certain apps are available — perfect for bedtime, homework, and family dinners.</p>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">🚫</div>
+        <h3>Content Restrictions</h3>
+        <p>Block explicit content, restrict app downloads by age rating, and control web browsing.</p>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">🔒</div>
+        <h3>Screen Time Passcode</h3>
+        <p>Lock your settings so your child can't change or disable them without your permission.</p>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">📊</div>
+        <h3>Usage Reports</h3>
+        <p>See exactly how much time your child is spending on each app — and use that data to start conversations.</p>
+      </div>
+      <div class="topic-card">
+        <div class="topic-icon">👨‍👩‍👧</div>
+        <h3>Family Sharing Controls</h3>
+        <p>Manage all of your children's Screen Time settings remotely from your own device.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAILS -->
+  <section id="details">
+    <div class="section-label">Event Details</div>
+    <h2>Everything You Need to Know</h2>
+    <div class="details-grid">
+      <div class="detail-item">
+        <span class="detail-icon">📅</span>
+        <div>
+          <h4>Date &amp; Time</h4>
+          <p>Date TBA</p>
+          <p class="note">1 hour session</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">📍</span>
+        <div>
+          <h4>Location</h4>
+          <p>Port Washington Public Library</p>
+          <p class="note">Meeting Room TBA</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">🎟️</span>
+        <div>
+          <h4>Admission</h4>
+          <p>$10 per person</p>
+          <p class="note">Cash or Venmo at the door</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">👥</span>
+        <div>
+          <h4>Capacity</h4>
+          <p>40 seats maximum</p>
+          <p class="note">RSVP required to reserve your spot</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">🎓</span>
+        <div>
+          <h4>Who It's For</h4>
+          <p>Parents of children entering 6th grade and younger</p>
+        </div>
+      </div>
+      <div class="detail-item">
+        <span class="detail-icon">❤️</span>
+        <div>
+          <h4>Giving Back</h4>
+          <p>10% of all proceeds goes to the Friends of the Library foundation</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section id="rsvp">
+    <div class="section-label">Reserve Your Seat</div>
+    <h2>Space Is Limited</h2>
+    <p class="rsvp-desc">With only 40 seats available, I recommend RSVPing early. Admission is $10, paid in cash or Venmo at the door.</p>
+    <div class="rsvp-capacity">🪑 40 seats · First come, first served</div><br/>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfnyKAif9jd5W3Ig2NQyaNOGqfHPedg5_7mXwZVRVx1Mcr3EA/viewform?usp=dialog" class="btn-rsvp" target="_blank">RSVP Now — It's Free</a>
+    <p class="rsvp-note">Questions? Email <a href="mailto:saferscreens@trackhw.com" style="color:rgba(212,240,255,0.6);">saferscreens@trackhw.com</a></p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>Safer Screens</strong> · Port Washington, NY · <a href="mailto:saferscreens@trackhw.com">saferscreens@trackhw.com</a> · <a href="/index.html">saferscreens.trackhw.com</a>
+  </footer>
+
+  <script>
+    // Close mobile menu on link click
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.remove('open');
+        document.querySelector('.hamburger').classList.remove('open');
+      });
+    });
+  </script>
+
+</body>
+</html>
